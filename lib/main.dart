@@ -143,6 +143,7 @@ class _MainAppShellState extends State<MainAppShell> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBody: true,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 280),
         switchInCurve: Curves.easeOutCubic,

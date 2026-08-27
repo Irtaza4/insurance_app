@@ -21,7 +21,7 @@ class ClaimsScreen extends StatelessWidget {
     final claims = state.claims;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Your Claims',
@@ -42,7 +42,7 @@ class ClaimsScreen extends StatelessWidget {
           ? _buildEmptyState(context)
           : SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

@@ -29,14 +29,12 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 40),
-          child: Column(
+    return SafeArea(
+      bottom: false,
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 110),
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Top Hero Mesh Gradient Card (Slides down from above)
@@ -235,8 +233,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildEventCard(BuildContext context, InsuranceEvent event) {
