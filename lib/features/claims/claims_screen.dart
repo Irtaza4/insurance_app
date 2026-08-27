@@ -3,6 +3,7 @@ import '../../core/models/insurance_models.dart';
 import '../../core/state/insurance_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/utils/app_animations.dart';
 import '../../shared/widgets/buttons_and_inputs.dart';
 import '../../shared/widgets/claim_timeline_widget.dart';
 import 'submit_claim_modal.dart';
@@ -45,68 +46,80 @@ class ClaimsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Active summary banner
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.neutralBorder),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 14,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFF6E7E2),
-                            shape: BoxShape.circle,
+                  // Active summary banner (Slides down)
+                  SlideDownFade(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: AppColors.neutralBorder),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
                           ),
-                          child: const Icon(Icons.pending_actions_rounded, color: AppColors.primary, size: 24),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${state.activeClaims.length} Active Claim${state.activeClaims.length == 1 ? '' : 's'}',
-                                style: AppTypography.h2.copyWith(fontSize: 18),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Track live adjuster progress and payout updates',
-                                style: AppTypography.caption,
-                              ),
-                            ],
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF6E7E2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.pending_actions_rounded, color: AppColors.primary, size: 24),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${state.activeClaims.length} Active Claim${state.activeClaims.length == 1 ? '' : 's'}',
+                                  style: AppTypography.h2.copyWith(fontSize: 18),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Track live adjuster progress and payout updates',
+                                  style: AppTypography.caption,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
                   const SizedBox(height: 20),
 
-                  // Claims List
-                  ...claims.map((claim) => _buildClaimCard(context, claim)),
+                  // Claims List (Staggered Slide in from right)
+                  ...claims.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final claim = entry.value;
+                    return SlideRightFade(
+                      delay: Duration(milliseconds: 100 + index * 80),
+                      child: _buildClaimCard(context, claim),
+                    );
+                  }),
                 ],
               ),
             ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primaryDark,
-        foregroundColor: Colors.white,
-        elevation: 4,
-        icon: const Icon(Icons.add_rounded, size: 20),
-        label: Text('New Claim', style: AppTypography.button.copyWith(color: Colors.white)),
-        onPressed: () => _openSubmitClaimModal(context),
+      floatingActionButton: ScaleFadePop(
+        delay: const Duration(milliseconds: 200),
+        child: FloatingActionButton.extended(
+          backgroundColor: AppColors.primaryDark,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          icon: const Icon(Icons.add_rounded, size: 20),
+          label: Text('New Claim', style: AppTypography.button.copyWith(color: Colors.white)),
+          onPressed: () => _openSubmitClaimModal(context),
+        ),
       ),
     );
   }

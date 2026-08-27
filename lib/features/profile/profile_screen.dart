@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/state/insurance_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/utils/app_animations.dart';
 import '../notifications/notifications_screen.dart';
 import '../payments/payments_screen.dart';
 import '../policies/policies_screen.dart';
@@ -32,189 +33,200 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         child: Column(
           children: [
-            // User Header Profile Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.neutralBorder),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF3E2DB),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.softPeach, width: 2),
+            // User Header Profile Card (Slides down)
+            SlideDownFade(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.neutralBorder),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
                     ),
-                    child: Center(
-                      child: Text(
-                        'WS',
-                        style: AppTypography.h1.copyWith(
-                          color: AppColors.primary,
-                          fontSize: 22,
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3E2DB),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.softPeach, width: 2),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'WS',
+                          style: AppTypography.h1.copyWith(
+                            color: AppColors.primary,
+                            fontSize: 22,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          state.userName,
-                          style: AppTypography.h2.copyWith(fontSize: 20),
-                        ),
-                        const SizedBox(height: 4),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.statusActiveBg,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                state.memberTier,
-                                style: AppTypography.captionBold.copyWith(
-                                  color: AppColors.statusActiveText,
-                                  fontSize: 10.5,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            state.userName,
+                            style: AppTypography.h2.copyWith(fontSize: 20),
+                          ),
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.statusActiveBg,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.verified_rounded, color: Color(0xFF2E7D32), size: 16),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'KYC Verified',
-                                  style: AppTypography.caption.copyWith(
-                                    color: const Color(0xFF2E7D32),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 11.5,
+                                child: Text(
+                                  state.memberTier,
+                                  style: AppTypography.captionBold.copyWith(
+                                    color: AppColors.statusActiveText,
+                                    fontSize: 10.5,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.verified_rounded, color: Color(0xFF2E7D32), size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'KYC Verified',
+                                    style: AppTypography.caption.copyWith(
+                                      color: const Color(0xFF2E7D32),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 11.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
             const SizedBox(height: 24),
 
-            // Group 1: Account & Insurance
-            _buildSection(
-              title: 'Account & Management',
-              items: [
-                _ProfileItem(
-                  icon: Icons.person_outline_rounded,
-                  title: 'Personal information',
-                  subtitle: 'Name, address, contact details',
-                  onTap: () => _showPersonalInfoModal(context),
-                ),
-                _ProfileItem(
-                  icon: Icons.credit_card_rounded,
-                  title: 'Payment methods',
-                  subtitle: 'Visa •••• 4821, Apple Pay',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PaymentsScreen(state: state)),
-                    );
-                  },
-                ),
-                _ProfileItem(
-                  icon: Icons.folder_shared_outlined,
-                  title: 'Documents & Certificates',
-                  subtitle: 'All active policy schedules & tax forms',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PoliciesScreen(state: state)),
-                    );
-                  },
-                ),
-              ],
+            // Group 1: Account & Insurance (Slides in from right)
+            SlideRightFade(
+              delay: const Duration(milliseconds: 100),
+              child: _buildSection(
+                title: 'Account & Management',
+                items: [
+                  _ProfileItem(
+                    icon: Icons.person_outline_rounded,
+                    title: 'Personal information',
+                    subtitle: 'Name, address, contact details',
+                    onTap: () => _showPersonalInfoModal(context),
+                  ),
+                  _ProfileItem(
+                    icon: Icons.credit_card_rounded,
+                    title: 'Payment methods',
+                    subtitle: 'Visa •••• 4821, Apple Pay',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PaymentsScreen(state: state)),
+                      );
+                    },
+                  ),
+                  _ProfileItem(
+                    icon: Icons.folder_shared_outlined,
+                    title: 'Documents & Certificates',
+                    subtitle: 'All active policy schedules & tax forms',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PoliciesScreen(state: state)),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 20),
 
-            // Group 2: Preferences & Security
-            _buildSection(
-              title: 'Preferences & Security',
-              items: [
-                _ProfileItem(
-                  icon: Icons.notifications_none_rounded,
-                  title: 'Notifications',
-                  subtitle: '${state.unreadNotificationCount} unread updates',
-                  badgeCount: state.unreadNotificationCount,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => NotificationsScreen(state: state)),
-                    );
-                  },
-                ),
-                _ProfileItem(
-                  icon: Icons.lock_outline_rounded,
-                  title: 'Security & Biometrics',
-                  subtitle: 'Face ID & App Passcode enabled',
-                  onTap: () => _showSecurityModal(context),
-                ),
-              ],
+            // Group 2: Preferences & Security (Slides in from right)
+            SlideRightFade(
+              delay: const Duration(milliseconds: 200),
+              child: _buildSection(
+                title: 'Preferences & Security',
+                items: [
+                  _ProfileItem(
+                    icon: Icons.notifications_none_rounded,
+                    title: 'Notifications',
+                    subtitle: '${state.unreadNotificationCount} unread updates',
+                    badgeCount: state.unreadNotificationCount,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NotificationsScreen(state: state)),
+                      );
+                    },
+                  ),
+                  _ProfileItem(
+                    icon: Icons.lock_outline_rounded,
+                    title: 'Security & Biometrics',
+                    subtitle: 'Face ID & App Passcode enabled',
+                    onTap: () => _showSecurityModal(context),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 20),
 
-            // Group 3: Support
-            _buildSection(
-              title: 'Emergency & Support',
-              items: [
-                _ProfileItem(
-                  icon: Icons.headset_mic_outlined,
-                  title: '24/7 Roadside & Health Hotline',
-                  subtitle: 'Direct toll-free insurance dispatch',
-                  onTap: () => _showEmergencyHotlineModal(context),
-                ),
-                _ProfileItem(
-                  icon: Icons.help_outline_rounded,
-                  title: 'Help & FAQ',
-                  subtitle: 'Coverage glossary & claims guide',
-                  onTap: () => _showFaqModal(context),
-                ),
-                _ProfileItem(
-                  icon: Icons.logout_rounded,
-                  title: 'Log out',
-                  subtitle: 'Securely end session',
-                  isDestructive: true,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Logged out of session')),
-                    );
-                  },
-                ),
-              ],
+            // Group 3: Support (Slides in from right)
+            SlideRightFade(
+              delay: const Duration(milliseconds: 300),
+              child: _buildSection(
+                title: 'Emergency & Support',
+                items: [
+                  _ProfileItem(
+                    icon: Icons.headset_mic_outlined,
+                    title: '24/7 Roadside & Health Hotline',
+                    subtitle: 'Direct toll-free insurance dispatch',
+                    onTap: () => _showEmergencyHotlineModal(context),
+                  ),
+                  _ProfileItem(
+                    icon: Icons.help_outline_rounded,
+                    title: 'Help Center & FAQs',
+                    subtitle: 'Policy guides, claims assistance',
+                    onTap: () => _showFaqModal(context),
+                  ),
+                  _ProfileItem(
+                    icon: Icons.logout_rounded,
+                    title: 'Log out',
+                    subtitle: 'Securely end session',
+                    isDestructive: true,
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Logged out of session')),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),

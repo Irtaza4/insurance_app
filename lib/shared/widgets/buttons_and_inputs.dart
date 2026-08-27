@@ -26,6 +26,7 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
@@ -44,22 +45,27 @@ class PrimaryButton extends StatelessWidget {
                   color: Colors.white,
                 ),
               )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (leadingIcon != null) ...[
-                    Icon(leadingIcon, size: 18, color: Colors.white),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    label,
-                    style: AppTypography.button.copyWith(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+            : FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (leadingIcon != null) ...[
+                      Icon(leadingIcon, size: 18, color: Colors.white),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      label,
+                      maxLines: 1,
+                      style: AppTypography.button.copyWith(
+                        color: Colors.white,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
       ),
     );
@@ -88,28 +94,34 @@ class SecondaryButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           foregroundColor: AppColors.primaryDark,
           side: const BorderSide(color: Color(0xFFD8D2CF), width: 1.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (leadingIcon != null) ...[
-              Icon(leadingIcon, size: 18, color: AppColors.primaryDark),
-              const SizedBox(width: 8),
-            ],
-            Text(
-              label,
-              style: AppTypography.button.copyWith(
-                color: AppColors.primaryDark,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (leadingIcon != null) ...[
+                Icon(leadingIcon, size: 18, color: AppColors.primaryDark),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label,
+                maxLines: 1,
+                style: AppTypography.button.copyWith(
+                  color: AppColors.primaryDark,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import '../../core/models/insurance_models.dart';
 import '../../core/state/insurance_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/utils/app_animations.dart';
 import '../../shared/widgets/digital_insurance_card.dart';
 import '../../shared/widgets/hero_gradient_card.dart';
 import '../../shared/widgets/section_header.dart';
@@ -38,77 +39,87 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Top Hero Mesh Gradient Card
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                child: HeroGradientCard(
-                  greeting: state.userGreeting,
-                  userName: state.userName,
-                  activeClaimsCount: state.activeClaims.length,
-                  upcomingPremiumsCount: state.upcomingPayments.where((p) => !p.isPaid).length,
-                  dueDays: 27,
-                  totalPremiumAmount: state.totalUpcomingPremiums,
-                  onClaimsTap: onNavigateToClaims,
-                  onViewPremiumTap: onNavigateToPayments,
+              // 1. Top Hero Mesh Gradient Card (Slides down from above)
+              SlideDownFade(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  child: HeroGradientCard(
+                    greeting: state.userGreeting,
+                    userName: state.userName,
+                    activeClaimsCount: state.activeClaims.length,
+                    upcomingPremiumsCount: state.upcomingPayments.where((p) => !p.isPaid).length,
+                    dueDays: 27,
+                    totalPremiumAmount: state.totalUpcomingPremiums,
+                    onClaimsTap: onNavigateToClaims,
+                    onViewPremiumTap: onNavigateToPayments,
+                  ),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // 2. Services Section
-              const SectionHeader(title: 'Services'),
-              const SizedBox(height: 6),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              // 2. Services Section (Slides in from right)
+              SlideRightFade(
+                delay: const Duration(milliseconds: 100),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Row 1
-                    Row(
-                      children: [
-                        ServiceIconButton(
-                          icon: Icons.receipt_long_rounded,
-                          label: 'Payment',
-                          onTap: onNavigateToPayments,
-                        ),
-                        const SizedBox(width: 10),
-                        ServiceIconButton(
-                          icon: Icons.file_download_outlined,
-                          label: 'Statement Download',
-                          onTap: () => _showDownloadStatementModal(context),
-                        ),
-                        const SizedBox(width: 10),
-                        ServiceIconButton(
-                          icon: Icons.account_balance_wallet_outlined,
-                          label: 'Top up',
-                          onTap: () => _showTopUpModal(context),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    // Row 2
-                    Row(
-                      children: [
-                        ServiceIconButton(
-                          icon: Icons.near_me_rounded,
-                          label: 'Hospitals',
-                          onTap: onNavigateToHospitals,
-                        ),
-                        const SizedBox(width: 10),
-                        ServiceIconButton(
-                          icon: Icons.phone_in_talk_rounded,
-                          label: 'Teleconsult',
-                          onTap: onNavigateToTeleconsult,
-                        ),
-                        const SizedBox(width: 10),
-                        ServiceIconButton(
-                          icon: Icons.chat_bubble_rounded,
-                          label: 'Chat with',
-                          onTap: () => _showConciergeChatModal(context),
-                        ),
-                      ],
+                    const SectionHeader(title: 'Services'),
+                    const SizedBox(height: 6),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Row 1
+                          Row(
+                            children: [
+                              ServiceIconButton(
+                                icon: Icons.receipt_long_rounded,
+                                label: 'Payment',
+                                onTap: onNavigateToPayments,
+                              ),
+                              const SizedBox(width: 10),
+                              ServiceIconButton(
+                                icon: Icons.file_download_outlined,
+                                label: 'Statement Download',
+                                onTap: () => _showDownloadStatementModal(context),
+                              ),
+                              const SizedBox(width: 10),
+                              ServiceIconButton(
+                                icon: Icons.account_balance_wallet_outlined,
+                                label: 'Top up',
+                                onTap: () => _showTopUpModal(context),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          // Row 2
+                          Row(
+                            children: [
+                              ServiceIconButton(
+                                icon: Icons.near_me_rounded,
+                                label: 'Hospitals',
+                                onTap: onNavigateToHospitals,
+                              ),
+                              const SizedBox(width: 10),
+                              ServiceIconButton(
+                                icon: Icons.phone_in_talk_rounded,
+                                label: 'Teleconsult',
+                                onTap: onNavigateToTeleconsult,
+                              ),
+                              const SizedBox(width: 10),
+                              ServiceIconButton(
+                                icon: Icons.chat_bubble_rounded,
+                                label: 'Chat with',
+                                onTap: () => _showConciergeChatModal(context),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -116,77 +127,109 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // 3. Events Section
-              const SectionHeader(title: 'Events'),
-              const SizedBox(height: 4),
-              SizedBox(
-                height: 210,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: state.events.length,
-                  separatorBuilder: (context, index) => const SizedBox(width: 14),
-                  itemBuilder: (context, index) {
-                    final event = state.events[index];
-                    return _buildEventCard(context, event);
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // 4. e-Cards Section
-              SectionHeader(
-                title: 'e-Cards',
-                actionLabel: 'All Cards',
-                onActionTap: () => _showAllCardsModal(context),
-              ),
-              const SizedBox(height: 4),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    DigitalInsuranceCardWidget(
-                      card: state.digitalCard,
-                    ),
-                    const SizedBox(width: 14),
-                    // Peeking secondary card
-                    _buildSecondaryCard(),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 28),
-
-              // 5. Latest Teleconsult Section
-              const SectionHeader(title: 'Latest Teleconsult'),
-              const SizedBox(height: 4),
-              if (state.latestTeleconsult != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _buildTeleconsultCard(context, state.latestTeleconsult!),
-                ),
-
-              const SizedBox(height: 28),
-
-              // 6. Active Policies Quick Section
-              SectionHeader(
-                title: 'Active Policies',
-                actionLabel: 'View All (${state.policies.length})',
-                onActionTap: () {
-                  state.setNavIndex(1); // switch to policies/claims
-                },
-              ),
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              // 3. Events Section (Slides in from right)
+              SlideRightFade(
+                delay: const Duration(milliseconds: 200),
                 child: Column(
-                  children: state.policies.map((policy) {
-                    return _buildPolicyQuickTile(context, policy);
-                  }).toList(),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SectionHeader(title: 'Events'),
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      height: 210,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: state.events.length,
+                        separatorBuilder: (context, index) => const SizedBox(width: 14),
+                        itemBuilder: (context, index) {
+                          final event = state.events[index];
+                          return _buildEventCard(context, event);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 4. e-Cards Section (Slides in from right)
+              SlideRightFade(
+                delay: const Duration(milliseconds: 300),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SectionHeader(
+                      title: 'e-Cards',
+                      actionLabel: 'All Cards',
+                      onActionTap: () => _showAllCardsModal(context),
+                    ),
+                    const SizedBox(height: 4),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          DigitalInsuranceCardWidget(
+                            card: state.digitalCard,
+                          ),
+                          const SizedBox(width: 14),
+                          // Peeking secondary card
+                          _buildSecondaryCard(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // 5. Latest Teleconsult Section (Slides up with fade)
+              if (state.latestTeleconsult != null)
+                SlideUpFade(
+                  delay: const Duration(milliseconds: 380),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SectionHeader(title: 'Latest Teleconsult'),
+                      const SizedBox(height: 4),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _buildTeleconsultCard(context, state.latestTeleconsult!),
+                      ),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: 28),
+
+              // 6. Active Policies Quick Section (Slides up with fade)
+              SlideUpFade(
+                delay: const Duration(milliseconds: 460),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SectionHeader(
+                      title: 'Active Policies',
+                      actionLabel: 'View All (${state.policies.length})',
+                      onActionTap: () {
+                        state.setNavIndex(1);
+                      },
+                    ),
+                    const SizedBox(height: 4),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        children: state.policies.map((policy) {
+                          return _buildPolicyQuickTile(context, policy);
+                        }).toList(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

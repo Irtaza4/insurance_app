@@ -27,18 +27,30 @@ class HospitalCard extends StatelessWidget {
     return _buildExpandedCarouselCard(context);
   }
 
-  /// Large card shown in Map / Carousel view (Exact Match with Image 2)
+  String _getImageAssetPath(String imageType) {
+    switch (imageType) {
+      case 'brick_clinic':
+        return 'assets/images/hospital_vitalspring.jpg';
+      case 'glass_wing':
+        return 'assets/images/hospital_parkside.jpg';
+      case 'modern_facade':
+      default:
+        return 'assets/images/hospital_harmony.jpg';
+    }
+  }
+
+  /// Large card shown in Map / Carousel view (Exact Match with Reference Image Left Screen)
   Widget _buildExpandedCarouselCard(BuildContext context) {
     return Container(
-      width: 320,
+      width: 325,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E1816).withValues(alpha: 0.12),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
+            color: const Color(0xFF1E1816).withValues(alpha: 0.10),
+            blurRadius: 26,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -46,20 +58,25 @@ class HospitalCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Building Visual Banner with Category Badge
+          // 1. Building Visual Banner with Modern Architectural Photography
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             child: SizedBox(
-              height: 185,
+              height: 175,
               width: double.infinity,
               child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: _ArchitecturalBuildingPainter(),
-                    ),
+                  Image.asset(
+                    _getImageAssetPath(hospital.imageType),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return CustomPaint(
+                        painter: _ArchitecturalApexBuildingPainter(),
+                      );
+                    },
                   ),
-                  // Soft bottom gradient fade into card surface
+                  // Bottom smooth gradient fade into white card surface
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -72,29 +89,9 @@ class HospitalCard extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.white.withValues(alpha: 0.0),
-                            Colors.white.withValues(alpha: 0.85),
+                            Colors.white.withValues(alpha: 0.8),
                             Colors.white,
                           ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Category Pill Badge (Peach with dark text matching Reference)
-                  Positioned(
-                    bottom: 8,
-                    left: 18,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFB692),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        hospital.categoryLabel,
-                        style: AppTypography.captionBold.copyWith(
-                          color: const Color(0xFF381F1A),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
                         ),
                       ),
                     ),
@@ -104,17 +101,36 @@ class HospitalCard extends StatelessWidget {
             ),
           ),
 
-          // Details & Actions
+          // 2. Details & Category Badge & Actions
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 6, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Title: Harmony General Hospital
+                // Category Pill Badge (Peach with dark brown text matching Reference)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5.5),
+                  decoration: BoxDecoration(
+                    color: _getCategoryBgColor(hospital.categoryLabel),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    hospital.categoryLabel,
+                    style: AppTypography.captionBold.copyWith(
+                      color: const Color(0xFF381F1A),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Hospital Name: Harmony General Hospital
                 Text(
                   hospital.name,
                   style: AppTypography.h2.copyWith(
-                    fontSize: 21,
+                    fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF1E1816),
                     letterSpacing: -0.3,
@@ -122,22 +138,22 @@ class HospitalCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 6),
 
                 // Location / Distance: "📍 Fenimore St 22A (2.3km)"
                 Row(
                   children: [
                     const Icon(
                       Icons.location_on_rounded,
-                      size: 17,
+                      size: 15,
                       color: Color(0xFFACAAA8),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 5),
                     Expanded(
                       child: Text(
                         hospital.address,
                         style: AppTypography.bodySecondary.copyWith(
-                          fontSize: 13.5,
+                          fontSize: 13,
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF5A5452),
                         ),
@@ -146,24 +162,24 @@ class HospitalCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
 
-                // Open Status: "📍 Open • Close at 23:30"
+                // Hours Status: "📍 Open • Close at 23:30"
                 Row(
                   children: [
                     const Icon(
-                      Icons.access_time_filled_rounded,
-                      size: 16,
+                      Icons.location_on_rounded,
+                      size: 15,
                       color: Color(0xFFACAAA8),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 5),
                     Expanded(
                       child: Text(
                         hospital.openStatus,
                         style: AppTypography.caption.copyWith(
                           color: const Color(0xFF5A5452),
                           fontWeight: FontWeight.w500,
-                          fontSize: 13,
+                          fontSize: 12.5,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -171,9 +187,9 @@ class HospitalCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
 
-                // Actions Row
+                // Action Buttons Row: [↗ Direction] [📞] [•••]
                 Row(
                   children: [
                     // Direction Button
@@ -184,20 +200,20 @@ class HospitalCard extends StatelessWidget {
                           onTap: onDirectionTap,
                           borderRadius: BorderRadius.circular(24),
                           child: Container(
-                            height: 48,
+                            height: 46,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Color(0xFF423D3A),
+                                  Color(0xFF484340),
                                   Color(0xFF24201E),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(24),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF1E1816).withValues(alpha: 0.3),
+                                  color: const Color(0xFF1E1816).withValues(alpha: 0.28),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -208,7 +224,7 @@ class HospitalCard extends StatelessWidget {
                               children: [
                                 const Icon(
                                   Icons.north_east_rounded,
-                                  size: 16,
+                                  size: 15,
                                   color: Colors.white,
                                 ),
                                 const SizedBox(width: 6),
@@ -250,19 +266,19 @@ class HospitalCard extends StatelessWidget {
     );
   }
 
-  /// Compact List Card shown in Full List View
+  /// Compact List Card shown in Floating List View (Exact Match with Reference Image Right Screen)
   Widget _buildCompactListCard(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.neutralBorder, width: 1),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.neutralBorder.withValues(alpha: 0.7), width: 1),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E1816).withValues(alpha: 0.04),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
+            color: const Color(0xFF1E1816).withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -270,34 +286,66 @@ class HospitalCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onDirectionTap,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(24),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                // Thumbnail building
+                // Thumbnail building with right gradient blend into white
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                   child: SizedBox(
-                    width: 78,
-                    height: 78,
-                    child: CustomPaint(
-                      painter: _ArchitecturalBuildingPainter(),
+                    width: 86,
+                    height: 82,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          _getImageAssetPath(hospital.imageType),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return CustomPaint(
+                              painter: _ArchitecturalApexBuildingPainter(),
+                            );
+                          },
+                        ),
+                        // Right edge fade
+                        Positioned(
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          width: 28,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.0),
+                                  Colors.white.withValues(alpha: 0.8),
+                                  Colors.white,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 const SizedBox(width: 14),
 
-                // Info
+                // Info Section
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Badge
+                      // Category Badge
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFB692),
+                          color: _getCategoryBgColor(hospital.categoryLabel),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -305,40 +353,41 @@ class HospitalCard extends StatelessWidget {
                           style: AppTypography.caption.copyWith(
                             color: const Color(0xFF381F1A),
                             fontWeight: FontWeight.w700,
-                            fontSize: 10.5,
+                            fontSize: 11,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 5),
 
-                      // Name
+                      // Name: e.g. Harmony General Hospital / VitalSpring Medical
                       Text(
                         hospital.name,
                         style: AppTypography.h3.copyWith(
                           fontSize: 15.5,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primaryDark,
+                          color: const Color(0xFF1E1816),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
 
-                      // Address
+                      // Address: 📍 Fenimore St 22A (2.3km)
                       Row(
                         children: [
                           const Icon(
                             Icons.location_on_rounded,
                             size: 14,
-                            color: AppColors.textGray,
+                            color: Color(0xFFACAAA8),
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               hospital.address,
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.textGray,
+                                color: const Color(0xFF6B6663),
                                 fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -347,11 +396,6 @@ class HospitalCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  size: 22,
-                  color: AppColors.textGray,
                 ),
               ],
             ),
@@ -371,114 +415,84 @@ class HospitalCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Container(
-          width: 48,
-          height: 48,
+          width: 46,
+          height: 46,
           decoration: BoxDecoration(
             color: const Color(0xFFF3F1ED),
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFF1E1816).withValues(alpha: 0.05),
+              color: const Color(0xFF1E1816).withValues(alpha: 0.06),
               width: 1,
             ),
           ),
           child: Icon(
             icon,
-            size: 20,
+            size: 19,
             color: const Color(0xFF1E1816),
           ),
         ),
       ),
     );
   }
+
+  Color _getCategoryBgColor(String category) {
+    if (category.contains('Dental') || category.contains('Oral')) {
+      return const Color(0xFFFFD1C2);
+    }
+    if (category.contains('Mental') || category.contains('Behavioral')) {
+      return const Color(0xFFE2E4EB);
+    }
+    return const Color(0xFFFFB692); // Default warm peach
+  }
 }
 
-/// Custom painter rendering the exact modern architectural building facade shown in Image 2
-class _ArchitecturalBuildingPainter extends CustomPainter {
+/// Fallback Apex Building Painter
+class _ArchitecturalApexBuildingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Sky background
+    final w = size.width;
+    final h = size.height;
+
     final skyPaint = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          Color(0xFFD6DBE0),
-          Color(0xFFE9ECF0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), skyPaint);
-
-    // Architectural Apex Perspective (Points upward-right matching Image 2)
-    final apex = Offset(size.width * 0.52, size.height * 0.12);
-
-    // Left Facade (Light Concrete & Glass Ribbon Windows)
-    final leftFacade = Path()
-      ..moveTo(apex.dx, apex.dy)
-      ..lineTo(size.width * 0.05, size.height * 0.85)
-      ..lineTo(apex.dx, size.height * 0.85)
-      ..close();
-
-    final leftPaint = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topRight,
-        end: Alignment.bottomLeft,
-        colors: [
-          Color(0xFFF2F4F7),
-          Color(0xFFC0C7D0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-    canvas.drawPath(leftFacade, leftPaint);
-
-    // Right Facade (Warm Honey Cedar Timber Paneling matching Image 2)
-    final rightFacade = Path()
-      ..moveTo(apex.dx, apex.dy)
-      ..lineTo(size.width * 0.88, size.height * 0.85)
-      ..lineTo(apex.dx, size.height * 0.85)
-      ..close();
-
-    final rightPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Color(0xFFD37B47),
-          Color(0xFFB55D2E),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-    canvas.drawPath(rightFacade, rightPaint);
+        colors: [Color(0xFFCDD6DF), Color(0xFFE4E9EF), Color(0xFFEEF2F6)],
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), skyPaint);
 
-    // Left Window Bands
-    final windowPaint = Paint()
-      ..color = const Color(0xFF2B3A48).withValues(alpha: 0.75)
-      ..strokeWidth = 3.5
-      ..style = PaintingStyle.stroke;
+    final apex = Offset(w * 0.54, h * 0.16);
+    final leftHorizon = Offset(-w * 0.05, h * 0.95);
+    final rightHorizon = Offset(w * 1.05, h * 0.95);
+    final centerBase = Offset(apex.dx, h * 1.0);
 
-    for (int i = 1; i <= 6; i++) {
-      final t = i / 7.0;
-      final y = apex.dy + (size.height * 0.85 - apex.dy) * t;
-      final xLeft = apex.dx - (apex.dx - size.width * 0.05) * t;
-      canvas.drawLine(Offset(apex.dx, y), Offset(xLeft, y + 2), windowPaint);
-    }
+    final rightFacade = Path()
+      ..moveTo(apex.dx, apex.dy)
+      ..lineTo(rightHorizon.dx, rightHorizon.dy)
+      ..lineTo(centerBase.dx, centerBase.dy)
+      ..close();
 
-    // Right Window Slats / Timber Louvers
-    final timberLouverPaint = Paint()
-      ..color = const Color(0xFF753618).withValues(alpha: 0.5)
-      ..strokeWidth = 2.0
-      ..style = PaintingStyle.stroke;
+    canvas.drawPath(
+      rightFacade,
+      Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0xFFD67543), Color(0xFFBE5E2E), Color(0xFFA24A1E)],
+        ).createShader(Rect.fromLTWH(0, 0, w, h)),
+    );
 
-    for (int i = 1; i <= 8; i++) {
-      final t = i / 9.0;
-      final y = apex.dy + (size.height * 0.85 - apex.dy) * t;
-      final xRight = apex.dx + (size.width * 0.88 - apex.dx) * t;
-      canvas.drawLine(Offset(apex.dx, y), Offset(xRight, y + 3), timberLouverPaint);
-    }
+    final leftFacade = Path()
+      ..moveTo(apex.dx, apex.dy)
+      ..lineTo(leftHorizon.dx, leftHorizon.dy)
+      ..lineTo(centerBase.dx, centerBase.dy)
+      ..close();
 
-    // Center vertical spine edge
-    final spinePaint = Paint()
-      ..color = const Color(0xFF4A2514)
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(apex, Offset(apex.dx, size.height * 0.85), spinePaint);
+    canvas.drawPath(
+      leftFacade,
+      Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0xFFF7F9FA), Color(0xFFCFD6DF), Color(0xFF98A6B5)],
+        ).createShader(Rect.fromLTWH(0, 0, w, h)),
+    );
   }
 
   @override

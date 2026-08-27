@@ -10,6 +10,7 @@ import 'features/payments/payments_screen.dart';
 import 'features/policies/policy_detail_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/rewards/rewards_screen.dart';
+import 'features/splash/splash_screen.dart';
 import 'features/teleconsult/teleconsult_screen.dart';
 import 'shared/widgets/custom_bottom_nav.dart';
 
@@ -27,7 +28,12 @@ void main() {
 }
 
 class InsuranceApp extends StatefulWidget {
-  const InsuranceApp({super.key});
+  final bool showSplash;
+
+  const InsuranceApp({
+    super.key,
+    this.showSplash = true,
+  });
 
   @override
   State<InsuranceApp> createState() => _InsuranceAppState();
@@ -51,7 +57,9 @@ class _InsuranceAppState extends State<InsuranceApp> {
           title: 'Antigravity Insurance',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          home: MainAppShell(state: _state),
+          home: widget.showSplash
+              ? SplashScreen(state: _state)
+              : MainAppShell(state: _state),
         );
       },
     );
@@ -71,54 +79,87 @@ class MainAppShell extends StatefulWidget {
 }
 
 class _MainAppShellState extends State<MainAppShell> {
+  Widget _buildCurrentScreen(int currentIndex) {
+    switch (currentIndex) {
+      case 0:
+        return HomeScreen(
+          key: const ValueKey('home_tab_screen'),
+          state: widget.state,
+          onNavigateToClaims: () => widget.state.setNavIndex(1),
+          onNavigateToHospitals: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HospitalsScreen(
+                  state: widget.state,
+                  onBack: () => Navigator.pop(context),
+                ),
+              ),
+            );
+          },
+          onNavigateToPayments: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PaymentsScreen(state: widget.state)),
+            );
+          },
+          onNavigateToTeleconsult: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TeleconsultScreen(state: widget.state)),
+            );
+          },
+          onSelectPolicy: (policy) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PolicyDetailScreen(policy: policy, state: widget.state),
+              ),
+            );
+          },
+        );
+      case 1:
+        return ClaimsScreen(
+          key: const ValueKey('claims_tab_screen'),
+          state: widget.state,
+        );
+      case 2:
+        return RewardsScreen(
+          key: const ValueKey('rewards_tab_screen'),
+          state: widget.state,
+        );
+      case 3:
+      default:
+        return ProfileScreen(
+          key: const ValueKey('profile_tab_screen'),
+          state: widget.state,
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentIndex = widget.state.currentNavIndex;
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: IndexedStack(
-        index: currentIndex,
-        children: [
-          HomeScreen(
-            state: widget.state,
-            onNavigateToClaims: () => widget.state.setNavIndex(1),
-            onNavigateToHospitals: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HospitalsScreen(
-                    state: widget.state,
-                    onBack: () => Navigator.pop(context),
-                  ),
-                ),
-              );
-            },
-            onNavigateToPayments: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PaymentsScreen(state: widget.state)),
-              );
-            },
-            onNavigateToTeleconsult: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TeleconsultScreen(state: widget.state)),
-              );
-            },
-            onSelectPolicy: (policy) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PolicyDetailScreen(policy: policy, state: widget.state),
-                ),
-              );
-            },
-          ),
-          ClaimsScreen(state: widget.state),
-          RewardsScreen(state: widget.state),
-          ProfileScreen(state: widget.state),
-        ],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 280),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (child, animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.03, 0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            ),
+          );
+        },
+        child: _buildCurrentScreen(currentIndex),
       ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: currentIndex,

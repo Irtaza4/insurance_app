@@ -3,6 +3,7 @@ import '../../core/models/insurance_models.dart';
 import '../../core/state/insurance_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/utils/app_animations.dart';
 import 'policy_detail_screen.dart';
 
 class PoliciesScreen extends StatelessWidget {
@@ -35,86 +36,98 @@ class PoliciesScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Total Coverage Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.neutralBorder),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Your Coverage', style: AppTypography.bodySecondary),
-                  const SizedBox(height: 6),
-                  Text(
-                    '\$${totalCoverage.toStringAsFixed(0)}',
-                    style: AppTypography.display.copyWith(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryDark,
+            // Total Coverage Card (Slides down)
+            SlideDownFade(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.neutralBorder),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.statusActiveBg,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'Active',
-                          style: AppTypography.captionBold.copyWith(
-                            color: AppColors.statusActiveText,
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Your Coverage', style: AppTypography.bodySecondary),
+                    const SizedBox(height: 6),
+                    Text(
+                      '\$${totalCoverage.toStringAsFixed(0)}',
+                      style: AppTypography.display.copyWith(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.statusActiveBg,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Active',
+                            style: AppTypography.captionBold.copyWith(
+                              color: AppColors.statusActiveText,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${state.policies.length} policies protected',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.secondaryBrown,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(width: 8),
+                        Text(
+                          '${state.policies.length} policies protected',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.secondaryBrown,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            // Filter Tabs (All, Auto, Health, Home, Life)
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: [
-                  _filterChip(null, 'All (${state.policies.length})'),
-                  _filterChip(PolicyCategory.auto, 'Auto'),
-                  _filterChip(PolicyCategory.health, 'Health'),
-                  _filterChip(PolicyCategory.home, 'Home'),
-                  _filterChip(PolicyCategory.life, 'Life'),
-                ],
+            // Filter Tabs (Slides in from right)
+            SlideRightFade(
+              delay: const Duration(milliseconds: 100),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    _filterChip(null, 'All (${state.policies.length})'),
+                    _filterChip(PolicyCategory.auto, 'Auto'),
+                    _filterChip(PolicyCategory.health, 'Health'),
+                    _filterChip(PolicyCategory.home, 'Home'),
+                    _filterChip(PolicyCategory.life, 'Life'),
+                  ],
+                ),
               ),
             ),
 
             const SizedBox(height: 16),
 
-            // Policy Cards List
-            ...filtered.map((policy) => _buildPolicyCard(context, policy)),
+            // Policy Cards List (Staggered slide in from right)
+            ...filtered.asMap().entries.map((entry) {
+              final index = entry.key;
+              final policy = entry.value;
+              return SlideRightFade(
+                delay: Duration(milliseconds: 120 + index * 60),
+                child: _buildPolicyCard(context, policy),
+              );
+            }),
           ],
         ),
       ),

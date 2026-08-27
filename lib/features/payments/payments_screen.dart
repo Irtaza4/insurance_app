@@ -3,6 +3,7 @@ import '../../core/models/insurance_models.dart';
 import '../../core/state/insurance_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/utils/app_animations.dart';
 import '../../shared/widgets/buttons_and_inputs.dart';
 
 class PaymentsScreen extends StatelessWidget {
@@ -32,149 +33,165 @@ class PaymentsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Next Payment Hero Card (Section 15 of spec)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.neutralBorder),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+            // 1. Next Payment Hero Card (Slides down)
+            SlideDownFade(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.neutralBorder),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Next payment', style: AppTypography.bodySecondary),
+                    const SizedBox(height: 6),
+                    Text(
+                      '\$${state.totalUpcomingPremiums.toStringAsFixed(2)}',
+                      style: AppTypography.display.copyWith(
+                        fontSize: 34,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time_rounded, size: 15, color: AppColors.textGray),
+                        const SizedBox(width: 5),
+                        Text('Due 12 Sep 2026', style: AppTypography.captionBold.copyWith(color: AppColors.secondaryBrown)),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: PrimaryButton(
+                            label: 'Pay now',
+                            height: 48,
+                            onPressed: state.upcomingPayments.isNotEmpty
+                                ? () => _showPayNowModal(context, state.upcomingPayments.first)
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: SecondaryButton(
+                            label: 'Manage auto-pay',
+                            height: 48,
+                            onPressed: () => _showAutoPayModal(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+            ),
+
+            const SizedBox(height: 28),
+
+            // 2. Upcoming Premiums Breakdown (Slides in from right)
+            SlideRightFade(
+              delay: const Duration(milliseconds: 140),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Next payment', style: AppTypography.bodySecondary),
-                  const SizedBox(height: 6),
                   Text(
-                    '\$${state.totalUpcomingPremiums.toStringAsFixed(2)}',
-                    style: AppTypography.display.copyWith(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryDark,
-                    ),
+                    'Upcoming Invoices (${state.upcomingPayments.length})',
+                    style: AppTypography.h2.copyWith(fontSize: 18),
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time_rounded, size: 15, color: AppColors.textGray),
-                      const SizedBox(width: 5),
-                      Text('Due 12 Sep 2026', style: AppTypography.captionBold.copyWith(color: AppColors.secondaryBrown)),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: PrimaryButton(
-                          label: 'Pay now',
-                          height: 48,
-                          onPressed: state.upcomingPayments.isNotEmpty
-                              ? () => _showPayNowModal(context, state.upcomingPayments.first)
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: SecondaryButton(
-                          label: 'Manage auto-pay',
-                          height: 48,
-                          onPressed: () => _showAutoPayModal(context),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const SizedBox(height: 12),
+                  ...state.upcomingPayments.map((item) => _buildInvoiceTile(context, item)),
                 ],
               ),
             ),
 
             const SizedBox(height: 28),
 
-            // 2. Upcoming Premiums Breakdown
-            Text(
-              'Upcoming Invoices (${state.upcomingPayments.length})',
-              style: AppTypography.h2.copyWith(fontSize: 18),
-            ),
-            const SizedBox(height: 12),
-
-            ...state.upcomingPayments.map((item) => _buildInvoiceTile(context, item)),
-
-            const SizedBox(height: 28),
-
-            // 3. Payment History
-            Text(
-              'Payment History',
-              style: AppTypography.h2.copyWith(fontSize: 18),
-            ),
-            const SizedBox(height: 12),
-
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.neutralBorder),
-              ),
+            // 3. Payment History (Slides up with fade)
+            SlideUpFade(
+              delay: const Duration(milliseconds: 260),
               child: Column(
-                children: state.paymentHistory.map((item) {
-                  final isLast = state.paymentHistory.indexOf(item) == state.paymentHistory.length - 1;
-                  return Column(
-                    children: [
-                      ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                        leading: Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF6F3EF),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(item.category.icon, color: AppColors.secondaryBrown, size: 20),
-                        ),
-                        title: Text(item.title, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600, fontSize: 14.5)),
-                        subtitle: Text('Paid on ${item.paidDate ?? item.dueDate} • #${item.policyNumber}', style: AppTypography.caption),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Payment History',
+                    style: AppTypography.h2.copyWith(fontSize: 18),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: AppColors.neutralBorder),
+                    ),
+                    child: Column(
+                      children: state.paymentHistory.map((item) {
+                        final isLast = state.paymentHistory.indexOf(item) == state.paymentHistory.length - 1;
+                        return Column(
                           children: [
-                            Text(
-                              '\$${item.amount.toStringAsFixed(2)}',
-                              style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5),
-                            ),
-                            const SizedBox(height: 2),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.statusApprovedBg,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Paid',
-                                style: AppTypography.caption.copyWith(
-                                  color: AppColors.statusApprovedText,
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w700,
+                            ListTile(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                              leading: Container(
+                                width: 42,
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF6F3EF),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
+                                child: Icon(item.category.icon, color: AppColors.secondaryBrown, size: 20),
                               ),
+                              title: Text(item.title, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600, fontSize: 14.5)),
+                              subtitle: Text('Paid on ${item.paidDate ?? item.dueDate} • #${item.policyNumber}', style: AppTypography.caption),
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '\$${item.amount.toStringAsFixed(2)}',
+                                    style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w700, fontSize: 14.5),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.statusApprovedBg,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      'Paid',
+                                      style: AppTypography.caption.copyWith(
+                                        color: AppColors.statusApprovedText,
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Downloading receipt for ${item.title}...')),
+                                );
+                              },
                             ),
+                            if (!isLast) const Divider(height: 1, color: AppColors.neutralBorder),
                           ],
-                        ),
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Downloading receipt for ${item.title}...')),
-                          );
-                        },
-                      ),
-                      if (!isLast) const Divider(height: 1, color: AppColors.neutralBorder),
-                    ],
-                  );
-                }).toList(),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

@@ -3,6 +3,7 @@ import '../../core/models/insurance_models.dart';
 import '../../core/state/insurance_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/utils/app_animations.dart';
 import '../../shared/widgets/buttons_and_inputs.dart';
 import '../claims/submit_claim_modal.dart';
 
@@ -48,79 +49,123 @@ class PolicyDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hero Overview Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.neutralBorder),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+            // Hero Overview Card (Slides down)
+            SlideDownFade(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.neutralBorder),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF6E7E2),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(policy.category.icon, color: AppColors.primary, size: 28),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                policy.name,
+                                style: AppTypography.h2.copyWith(fontSize: 19),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Policy #${policy.policyNumber}',
+                                style: AppTypography.captionBold.copyWith(
+                                  color: AppColors.textGray,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 22),
+                    const Divider(color: AppColors.neutralBorder),
+                    const SizedBox(height: 18),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _overviewStat('Total Coverage', '\$${policy.coverageAmount.toStringAsFixed(0)}'),
+                        _overviewStat('Monthly Premium', '\$${policy.premiumMonthly.toStringAsFixed(2)}'),
+                        _overviewStat('Deductible', '\$${policy.deductible.toStringAsFixed(0)}'),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        const Icon(Icons.event_repeat_rounded, size: 16, color: AppColors.textGray),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Renews on ${policy.renewalDate}',
+                          style: AppTypography.caption.copyWith(color: AppColors.secondaryBrown, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Coverage Limits Section (Slides in from right)
+            SlideRightFade(
+              delay: const Duration(milliseconds: 140),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF6E7E2),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Icon(policy.category.icon, color: AppColors.primary, size: 28),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  Text('Coverage Breakdown', style: AppTypography.h2.copyWith(fontSize: 18)),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: AppColors.neutralBorder),
+                    ),
+                    child: Column(
+                      children: policy.coverages.map((item) {
+                        final isLast = policy.coverages.indexOf(item) == policy.coverages.length - 1;
+                        return Column(
                           children: [
-                            Text(
-                              policy.name,
-                              style: AppTypography.h2.copyWith(fontSize: 19),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(item.title, style: AppTypography.bodyMedium),
+                                Text(
+                                  '\$${item.amount.toStringAsFixed(0)}',
+                                  style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w700),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Policy #${policy.policyNumber}',
-                              style: AppTypography.captionBold.copyWith(
-                                color: AppColors.textGray,
-                              ),
-                            ),
+                            if (!isLast) const Divider(height: 24),
                           ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 22),
-                  const Divider(color: AppColors.neutralBorder),
-                  const SizedBox(height: 18),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _overviewStat('Total Coverage', '\$${policy.coverageAmount.toStringAsFixed(0)}'),
-                      _overviewStat('Monthly Premium', '\$${policy.premiumMonthly.toStringAsFixed(2)}'),
-                      _overviewStat('Deductible', '\$${policy.deductible.toStringAsFixed(0)}'),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      const Icon(Icons.event_repeat_rounded, size: 16, color: AppColors.textGray),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Renews on ${policy.renewalDate}',
-                        style: AppTypography.caption.copyWith(color: AppColors.secondaryBrown, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),
@@ -128,92 +173,68 @@ class PolicyDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Coverage Limits Section
-            Text('Coverage Breakdown', style: AppTypography.h2.copyWith(fontSize: 18)),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.neutralBorder),
-              ),
+            // Documents Section (Slides in from right)
+            SlideRightFade(
+              delay: const Duration(milliseconds: 240),
               child: Column(
-                children: policy.coverages.map((item) {
-                  final isLast = policy.coverages.indexOf(item) == policy.coverages.length - 1;
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(item.title, style: AppTypography.bodyMedium),
-                          Text(
-                            '\$${item.amount.toStringAsFixed(0)}',
-                            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w700),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Policy Documents', style: AppTypography.h2.copyWith(fontSize: 18)),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: AppColors.neutralBorder),
+                    ),
+                    child: Column(
+                      children: policy.documents.map((doc) {
+                        return ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF6F3EF),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.picture_as_pdf_outlined, color: AppColors.primary, size: 22),
                           ),
-                        ],
-                      ),
-                      if (!isLast) const Divider(height: 24),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Documents Section
-            Text('Policy Documents', style: AppTypography.h2.copyWith(fontSize: 18)),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.neutralBorder),
-              ),
-              child: Column(
-                children: policy.documents.map((doc) {
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF7F2EE),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.picture_as_pdf_rounded, color: AppColors.primary, size: 22),
-                    ),
-                    title: Text(doc.title, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600, fontSize: 14)),
-                    subtitle: Text('${doc.format} • ${doc.size} • ${doc.date}', style: AppTypography.caption),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.download_rounded, color: AppColors.primaryDark),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Downloading ${doc.title}...')),
+                          title: Text(doc.title, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+                          subtitle: Text('${doc.size} • Uploaded ${doc.date}', style: AppTypography.caption),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.download_rounded, color: AppColors.primaryDark),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Downloading ${doc.title}...')),
+                              );
+                            },
+                          ),
                         );
-                      },
+                      }).toList(),
                     ),
-                  );
-                }).toList(),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 28),
 
-            // Action: Start Claim for this policy
-            PrimaryButton(
-              label: 'File a Claim for this Policy',
-              leadingIcon: Icons.add_circle_outline_rounded,
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => SubmitClaimModal(state: state),
-                );
-              },
+            // Actions (Slides up)
+            SlideUpFade(
+              delay: const Duration(milliseconds: 320),
+              child: PrimaryButton(
+                label: 'File Claim on This Policy',
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => SubmitClaimModal(state: state),
+                  );
+                },
+              ),
             ),
           ],
         ),
