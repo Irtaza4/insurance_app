@@ -429,50 +429,23 @@ class HomeScreen extends StatelessWidget {
         width: 70,
         height: 165,
         decoration: BoxDecoration(
-          color: const Color(0xFFDCD8D3),
+          color: const Color(0xFFE4DFD9),
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: Colors.white, width: 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: const Color(0xFF1E1816).withValues(alpha: 0.05),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: Stack(
-          children: [
-            Positioned(
-              left: 12,
-              top: 48,
-              child: Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/user_avatar_2.jpg',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: const Color(0xFF6B7280),
-                        child: const Icon(Icons.person, color: Colors.white, size: 24),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ],
+        child: Center(
+          child: Icon(
+            Icons.add_circle_outline_rounded,
+            color: AppColors.secondaryBrown.withValues(alpha: 0.5),
+            size: 28,
+          ),
         ),
       ),
     );
