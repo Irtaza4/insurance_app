@@ -134,7 +134,7 @@ class HomeScreen extends StatelessWidget {
                     const SectionHeader(title: 'Events'),
                     const SizedBox(height: 4),
                     SizedBox(
-                      height: 210,
+                      height: 235,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
@@ -176,7 +176,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 14),
                           // Peeking secondary card
-                          _buildSecondaryCard(),
+                          _buildSecondaryCard(context),
                         ],
                       ),
                     ),
@@ -236,17 +236,31 @@ class HomeScreen extends StatelessWidget {
       );
   }
 
+  String _getEventAssetPath(String heroTheme) {
+    switch (heroTheme) {
+      case 'gamification':
+        return 'assets/images/event_gamification.jpg';
+      case 'summit':
+        return 'assets/images/event_summit.jpg';
+      case 'wellness':
+      default:
+        return 'assets/images/event_wellness.jpg';
+    }
+  }
+
   Widget _buildEventCard(BuildContext context, InsuranceEvent event) {
+    final imagePath = _getEventAssetPath(event.heroTheme);
+
     return Container(
-      width: 220,
+      width: 235,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.neutralBorder, width: 1),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.neutralBorder.withValues(alpha: 0.8), width: 1),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E1816).withValues(alpha: 0.05),
-            blurRadius: 16,
+            color: const Color(0xFF1E1816).withValues(alpha: 0.06),
+            blurRadius: 18,
             offset: const Offset(0, 6),
           ),
         ],
@@ -255,39 +269,86 @@ class HomeScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => _showEventDetailModal(context, event),
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Event Hero Banner with stylized abstract background
+              // Event Hero Banner with Editorial Image
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(23)),
                 child: SizedBox(
-                  height: 110,
+                  height: 122,
                   width: double.infinity,
                   child: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: _EventThumbnailPainter(theme: event.heroTheme),
+                      Image.asset(
+                        imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return CustomPaint(
+                            painter: _EventThumbnailPainter(theme: event.heroTheme),
+                          );
+                        },
+                      ),
+                      // Soft gradient overlay for contrast
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withValues(alpha: 0.22),
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.15),
+                            ],
+                            stops: const [0.0, 0.45, 1.0],
+                          ),
                         ),
                       ),
+                      // Category Tag Badge (Frosted pill)
                       Positioned(
-                        top: 12,
-                        left: 12,
+                        top: 10,
+                        left: 10,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white.withValues(alpha: 0.95),
                             borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.10),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Text(
                             event.tag,
                             style: AppTypography.caption.copyWith(
                               color: event.badgeText,
                               fontWeight: FontWeight.w700,
-                              fontSize: 11,
+                              fontSize: 10.5,
                             ),
+                          ),
+                        ),
+                      ),
+                      // Bookmark Icon
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.35),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.bookmark_outline_rounded,
+                            color: Colors.white,
+                            size: 15,
                           ),
                         ),
                       ),
@@ -298,27 +359,58 @@ class HomeScreen extends StatelessWidget {
 
               // Title & Read time
               Padding(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       event.title,
                       style: AppTypography.h3.copyWith(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
-                        height: 1.35,
+                        color: const Color(0xFF1E1816),
+                        height: 1.3,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      event.readTime,
-                      style: AppTypography.caption.copyWith(
-                        fontSize: 11.5,
-                        color: AppColors.textGray,
-                      ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.schedule_rounded,
+                              size: 13,
+                              color: Color(0xFF9E9995),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              event.readTime,
+                              style: AppTypography.caption.copyWith(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF7A7570),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          width: 22,
+                          height: 22,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF4F2EE),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 12,
+                            color: Color(0xFF4A4440),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -330,26 +422,65 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSecondaryCard() {
-    return Container(
-      width: 70,
-      height: 160,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE4DFD9),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white, width: 2),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.add_circle_outline_rounded,
-          color: AppColors.secondaryBrown.withValues(alpha: 0.5),
-          size: 28,
+  Widget _buildSecondaryCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showAllCardsModal(context),
+      child: Container(
+        width: 70,
+        height: 165,
+        decoration: BoxDecoration(
+          color: const Color(0xFFDCD8D3),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              left: 12,
+              top: 48,
+              child: Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/user_avatar_2.jpg',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: const Color(0xFF6B7280),
+                        child: const Icon(Icons.person, color: Colors.white, size: 24),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildTeleconsultCard(BuildContext context, TeleconsultAppointment consult) {
+    final avatarImg = consult.avatarImagePath ?? 'assets/images/doctor_avatar.jpg';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
@@ -359,8 +490,8 @@ class HomeScreen extends StatelessWidget {
         border: Border.all(color: AppColors.neutralBorder, width: 1),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E1816).withValues(alpha: 0.04),
-            blurRadius: 18,
+            color: const Color(0xFF1E1816).withValues(alpha: 0.05),
+            blurRadius: 20,
             offset: const Offset(0, 6),
           ),
         ],
@@ -371,22 +502,36 @@ class HomeScreen extends StatelessWidget {
           // Doctor row
           Row(
             children: [
-              // Avatar
+              // Avatar with doctor photo
               Container(
-                width: 48,
-                height: 48,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF3E2DB),
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.softPeach, width: 1.5),
-                ),
-                child: Center(
-                  child: Text(
-                    consult.avatarInitials,
-                    style: AppTypography.h3.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    avatarImg,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Text(
+                          consult.avatarInitials,
+                          style: AppTypography.h3.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -398,37 +543,46 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       consult.doctorName,
                       style: AppTypography.h3.copyWith(
-                        fontSize: 16,
+                        fontSize: 16.5,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDark,
+                        color: const Color(0xFF1E1816),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Wrap(
-                      spacing: 8,
+                      spacing: 6,
                       runSpacing: 4,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFECA382),
-                            borderRadius: BorderRadius.circular(8),
+                            color: const Color(0xFFF28F5A),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             consult.type,
                             style: AppTypography.caption.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              fontSize: 10.5,
+                              fontSize: 11,
                             ),
                           ),
                         ),
-                        Text(
-                          consult.dateTime,
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.textGray,
-                            fontSize: 11.5,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF6F5F2),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFE8E5E0)),
+                          ),
+                          child: Text(
+                            consult.dateTime,
+                            style: AppTypography.caption.copyWith(
+                              color: const Color(0xFF4A4440),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -440,7 +594,7 @@ class HomeScreen extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
-          const Divider(color: AppColors.neutralBorder, height: 1),
+          const Divider(color: Color(0xFFECEAE5), height: 1, thickness: 1),
           const SizedBox(height: 14),
 
           // Checkmarks
@@ -459,7 +613,7 @@ class HomeScreen extends StatelessWidget {
           width: 18,
           height: 18,
           decoration: const BoxDecoration(
-            color: AppColors.primaryDark,
+            color: Color(0xFF1E1816),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -473,9 +627,9 @@ class HomeScreen extends StatelessWidget {
           child: Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.primaryDark,
-              fontWeight: FontWeight.w600,
+              color: const Color(0xFF2C2724),
               fontSize: 12.5,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),

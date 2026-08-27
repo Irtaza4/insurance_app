@@ -104,6 +104,7 @@ class InsuranceState extends ChangeNotifier {
     tier: 'Premium',
     validThru: '09/28',
     policyRef: 'INS-28491',
+    avatarImagePath: 'assets/images/user_avatar.jpg',
   );
 
   // Insurance Events / Insights
@@ -363,6 +364,7 @@ class InsuranceState extends ChangeNotifier {
       hasLabOption: true,
       isPrescriptionCovered: true,
       avatarInitials: 'EC',
+      avatarImagePath: 'assets/images/doctor_avatar.jpg',
     );
 
     // 5. Payments & Premiums

@@ -225,6 +225,7 @@ class TeleconsultAppointment {
   final bool hasLabOption;
   final bool isPrescriptionCovered;
   final String avatarInitials;
+  final String? avatarImagePath;
 
   const TeleconsultAppointment({
     required this.id,
@@ -235,6 +236,7 @@ class TeleconsultAppointment {
     required this.hasLabOption,
     required this.isPrescriptionCovered,
     required this.avatarInitials,
+    this.avatarImagePath,
   });
 }
 
@@ -286,6 +288,7 @@ class DigitalCard {
   final String tier;
   final String validThru;
   final String policyRef;
+  final String? avatarImagePath;
 
   const DigitalCard({
     required this.cardId,
@@ -293,6 +296,7 @@ class DigitalCard {
     required this.tier,
     required this.validThru,
     required this.policyRef,
+    this.avatarImagePath,
   });
 }
 

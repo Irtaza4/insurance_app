@@ -80,117 +80,113 @@ class _DigitalInsuranceCardWidgetState extends State<DigitalInsuranceCardWidget>
   }
 
   Widget _buildFront() {
+    final avatarPath = widget.card.avatarImagePath ?? 'assets/images/user_avatar.jpg';
+
     return Container(
       width: 310,
       height: 165,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: const Color(0xFFCE4D31).withValues(alpha: 0.32),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
           ),
         ],
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFE86445),
-            Color(0xFFCE4D31),
-            Color(0xFFA53A23),
+            Color(0xFFE87352),
+            Color(0xFFDC5E40),
+            Color(0xFFB54124),
           ],
         ),
       ),
       child: Stack(
         children: [
-          // Background subtle fluid waves
+          // Background subtle fluid organic shapes
           Positioned.fill(
-            child: CustomPaint(
-              painter: _CardGlowPainter(),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: CustomPaint(
+                painter: _CardGlowPainter(),
+              ),
             ),
           ),
 
           Padding(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Top row: Chip & Card ID
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Smart Card Chip
-                    Container(
-                      width: 32,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFD59E),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFFE5B072), width: 1),
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 14,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFC48E50), width: 0.8),
-                          ),
-                        ),
-                      ),
+                // Top row: Card ID on the top right
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Text(
+                    widget.card.cardId,
+                    style: AppTypography.h2.copyWith(
+                      color: Colors.white,
+                      fontSize: 17.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
                     ),
-                    const SizedBox(width: 8),
-                    // Card ID
-                    Flexible(
-                      child: Text(
-                        widget.card.cardId,
-                        style: AppTypography.h3.copyWith(
-                          color: Colors.white,
-                          fontSize: 15.5,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
 
                 // Bottom row: Avatar & Holder details
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Member Avatar Circle
+                    // Member Avatar Circle with real photo
                     Container(
-                      width: 42,
-                      height: 42,
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                        color: const Color(0xFF381F1A),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'WS',
-                          style: AppTypography.button.copyWith(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          avatarPath,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: const Color(0xFF381F1A),
+                              child: Center(
+                                child: Text(
+                                  'WS',
+                                  style: AppTypography.button.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             widget.card.holderName,
                             style: AppTypography.bodyLarge.copyWith(
                               color: Colors.white,
-                              fontSize: 14,
+                              fontSize: 15.5,
                               fontWeight: FontWeight.w700,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -199,19 +195,13 @@ class _DigitalInsuranceCardWidgetState extends State<DigitalInsuranceCardWidget>
                           Text(
                             widget.card.tier,
                             style: AppTypography.caption.copyWith(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              fontSize: 11,
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    // Contactless / Tap icon
-                    Icon(
-                      Icons.contactless_rounded,
-                      color: Colors.white.withValues(alpha: 0.7),
-                      size: 20,
                     ),
                   ],
                 ),

@@ -69,11 +69,26 @@ class TeleconsultScreen extends StatelessWidget {
                                   color: const Color(0xFFF6E8E2),
                                   shape: BoxShape.circle,
                                   border: Border.all(color: AppColors.softPeach, width: 2),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    consult.avatarInitials,
-                                    style: AppTypography.h2.copyWith(color: AppColors.primary, fontSize: 18),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    consult.avatarImagePath ?? 'assets/images/doctor_avatar.jpg',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                        child: Text(
+                                          consult.avatarInitials,
+                                          style: AppTypography.h2.copyWith(color: AppColors.primary, fontSize: 18),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ),
