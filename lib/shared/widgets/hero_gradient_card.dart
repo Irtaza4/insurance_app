@@ -190,9 +190,9 @@ class HeroGradientCard extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            // Curled Rolled Document Graphic
+                            // Curled Rolled Document Graphic (Exact match with user reference)
                             CustomPaint(
-                              size: const Size(60, 52),
+                              size: const Size(68, 60),
                               painter: _CurledDocumentPainter(),
                             ),
                           ],
@@ -401,53 +401,145 @@ class _SerratedTicketPainter extends CustomPainter {
       oldDelegate.count != count;
 }
 
-/// Custom painter for the exact curled rolled parchment document from Image 2
+/// Custom painter for the exact curled rolled parchment document from user reference
 class _CurledDocumentPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // 1. Base sheet background (translucent light grey/white)
-    final sheetPath = Path()
-      ..moveTo(6, 4)
-      ..lineTo(size.width - 8, 4)
-      ..arcToPoint(Offset(size.width - 4, 8), radius: const Radius.circular(4))
-      ..lineTo(size.width - 4, size.height - 18)
-      ..lineTo(6, size.height - 18)
-      ..arcToPoint(const Offset(2, 8), radius: const Radius.circular(4))
-      ..close();
+    final w = size.width;
+    final h = size.height;
 
-    final sheetPaint = Paint()..color = const Color(0xFFF3F2EE);
-    canvas.drawPath(sheetPath, sheetPaint);
+    // 1. Soft ambient drop shadow behind the paper sheet
+    final shadowPath = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.20, h * 0.04, w * 0.68, h * 0.76),
+        const Radius.circular(8),
+      ));
+    canvas.drawShadow(shadowPath, const Color(0xFF1E1816).withValues(alpha: 0.10), 8, false);
 
-    // 2. Three horizontal document lines
-    final linePaint = Paint()
-      ..color = const Color(0xFFE0DBD5)
-      ..strokeWidth = 2.4
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawLine(const Offset(12, 14), Offset(size.width - 14, 14), linePaint);
-    canvas.drawLine(const Offset(12, 22), Offset(size.width - 24, 22), linePaint);
-    canvas.drawLine(const Offset(12, 30), Offset(size.width - 32, 30), linePaint);
-
-    // 3. Cylindrical rolled curl at the bottom right
-    final rollRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, size.height - 20, size.width, 18),
-      const Radius.circular(9),
+    // 2. Vertical Paper Sheet (Soft warm silver-gray parchment matching image)
+    final sheetRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(w * 0.20, h * 0.04, w * 0.68, h * 0.76),
+      const Radius.circular(6),
     );
+    final sheetPaint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0xFFF3F1EC),
+          Color(0xFFEBE8E2),
+          Color(0xFFE2DED7),
+        ],
+      ).createShader(sheetRect.outerRect);
+    canvas.drawRRect(sheetRect, sheetPaint);
+
+    // 3. Crisp Pure White Embossed Statement Lines (Matching user image)
+    final whiteLinePaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2.8
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    // Line 1: Long solid white pill bar
+    canvas.drawLine(
+      Offset(w * 0.30, h * 0.36),
+      Offset(w * 0.75, h * 0.36),
+      whiteLinePaint,
+    );
+
+    // Line 2: Segmented split white pill bar (Short + Gap + Long)
+    canvas.drawLine(
+      Offset(w * 0.30, h * 0.45),
+      Offset(w * 0.50, h * 0.45),
+      whiteLinePaint,
+    );
+    canvas.drawLine(
+      Offset(w * 0.56, h * 0.45),
+      Offset(w * 0.68, h * 0.45),
+      whiteLinePaint,
+    );
+
+    // Line 3: Medium solid white pill bar
+    canvas.drawLine(
+      Offset(w * 0.30, h * 0.54),
+      Offset(w * 0.62, h * 0.54),
+      whiteLinePaint,
+    );
+
+    // 4. Rolled Scroll Cylinder at the Bottom
+    // Under-roll dark shadow groove
+    final underShadowPath = Path()
+      ..moveTo(w * 0.12, h * 0.68)
+      ..lineTo(w * 0.90, h * 0.68)
+      ..lineTo(w * 0.90, h * 0.76)
+      ..lineTo(w * 0.12, h * 0.76)
+      ..close();
+    canvas.drawPath(
+      underShadowPath,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFF1E1816).withValues(alpha: 0.18),
+            Colors.transparent,
+          ],
+        ).createShader(underShadowPath.getBounds()),
+    );
+
+    // Main Horizontal Roll Cylinder
+    final rollRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(w * 0.04, h * 0.70, w * 0.84, h * 0.25),
+      const Radius.circular(10),
+    );
+
     final rollPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          Color(0xFFE7E3DC),
-          Color(0xFFD6D0C8),
+          Color(0xFFFAF9F6), // Top bright highlight
+          Color(0xFFE8E5DF),
+          Color(0xFFD2CBC1), // Lower shadow curve
         ],
-      ).createShader(Rect.fromLTWH(0, size.height - 20, size.width, 18));
+        stops: [0.0, 0.42, 1.0],
+      ).createShader(rollRect.outerRect);
     canvas.drawRRect(rollRect, rollPaint);
 
-    // End curl highlight
-    final curlCap = Paint()..color = const Color(0xFFC7C0B7);
-    canvas.drawCircle(Offset(size.width - 9, size.height - 11), 7.5, curlCap);
-    canvas.drawCircle(Offset(size.width - 9, size.height - 11), 4.5, Paint()..color = const Color(0xFFECE7E1));
+    // Left Circular Curl End / Cap
+    final curlCenter = Offset(w * 0.14, h * 0.825);
+    final curlRadius = h * 0.115;
+
+    // Darker inside roll hole with bevel
+    canvas.drawCircle(
+      curlCenter,
+      curlRadius,
+      Paint()
+        ..shader = const RadialGradient(
+          colors: [
+            Color(0xFFB4ACA0),
+            Color(0xFFCAC3B8),
+          ],
+        ).createShader(Rect.fromCircle(center: curlCenter, radius: curlRadius)),
+    );
+
+    // Outer spiral rim stroke highlight
+    final spiralPaint = Paint()
+      ..color = const Color(0xFFFAF9F6)
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke;
+    canvas.drawCircle(curlCenter, curlRadius - 0.8, spiralPaint);
+
+    // Right subtle roll bevel
+    final rightBevel = Paint()
+      ..color = const Color(0xFFC4BDB3).withValues(alpha: 0.55)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(
+      Offset(w * 0.88, h * 0.72),
+      Offset(w * 0.88, h * 0.93),
+      rightBevel,
+    );
   }
 
   @override
